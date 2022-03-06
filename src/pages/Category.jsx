@@ -63,6 +63,7 @@ function Category() {
     }
   }, [params.categoryName, isMounted])
 
+  console.log(params)
   return (
     <div className='category'>
       <header>

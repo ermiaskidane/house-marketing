@@ -19,6 +19,8 @@ import homeIcon from '../assets/svg/homeIcon.svg'
 
 function Profile() {
   const auth = getAuth()
+  const [loading, setLoading] = useState(true)
+  const [listings, setListings] = useState(null)
   const [changeDetails, setChangeDetails] = useState(false)
   const [formData, setFormData] = useState({
     name: auth.currentUser.displayName,
@@ -28,6 +30,37 @@ function Profile() {
   const { name, email } = formData
 
   const navigate = useNavigate()
+  
+    useEffect(() => {
+    const fetchUserListings = async () => {
+      const listingsRef = collection(db, 'listings')
+
+      const q = query(
+        listingsRef,
+        where('userRef', '==', auth.currentUser.uid),
+        orderBy('timestamp', 'desc')
+      )
+
+      const querySnap = await getDocs(q)
+
+      let listings = []
+
+      querySnap.forEach((doc) => {
+        // console.log(doc.data())
+        return listings.push({
+          id: doc.id,
+          data: doc.data(),
+        })
+      })
+
+      console.log(listings)
+
+      setListings(listings)
+      setLoading(false)
+    }
+
+    fetchUserListings()
+  }, [auth.currentUser.uid])
 
   const onLogout = () => {
     auth.signOut()
